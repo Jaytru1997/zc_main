@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useHistory, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { navigateToUrl } from "single-spa";
 
 import styles from "./Login.module.css";
 import {
@@ -89,8 +90,11 @@ export default function Index() {
             // console.log('reg orgs', orgs)
 
             switch (true) {
-              case orgs > 1:
-                history.push("/choose-workspace");
+              case orgs >= 1:
+                // history.push("/choose-workspace");
+                // console.log("here", orgs);
+                // history.push("/channels");
+                navigateToUrl("/channels");
                 break;
               case orgs < 1:
                 history.push("/create-workspace");
