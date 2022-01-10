@@ -23,52 +23,45 @@ export const Step1 = ({
   listEmail,
   handleDelete,
   setForerr,
-  setListEmail,
-  orgvalEmails,
   validateEmail,
   currentWorkspace,
-  sendButton
+  sendButton,
+  val,
+  setVal,
+  handleSubmit
 }) => {
-  const [val, setVal] = useState("");
   const [foc, setFoc] = useState(false);
+  const [canSend, setCanSend] = useState(false);
 
   const handleChange = e => {
     e.preventDefault();
     setVal(e.target.value);
     if (!e.target.value) {
       setForerr("");
+      setCanSend(true);
     } else {
       setForerr(validateEmail(e.target.value));
+      setCanSend(false);
     }
   };
 
-  const handleSubmit = e => {
+  const handleSend = e => {
     e.preventDefault();
-
-    if (!val) {
-      let error = "enter an email";
-      setForerr("");
-    } else if (validateEmail(val)) {
-      setForerr("Invalid Email address");
-    } else if (listEmail?.some(em => em.mail === val)) {
-      setListEmail([...listEmail, { mail: val, error: true }]);
-      let eror = "Email already included.";
-      setForerr(eror);
-      setVal("");
-    } else if (orgvalEmails.some(em => em === val)) {
-      setListEmail([...listEmail, { mail: val, error: true }]);
-      let eror = "Email already exists in the workspace.";
-      setForerr(eror);
-      setVal("");
+    if (!canSend) {
+      handleSubmit(e);
+      setCanSend(!canSend);
     } else {
-      setListEmail([...listEmail, { mail: val, error: false }]);
-      setForerr("");
-      setVal("");
+      sendButton(e);
     }
+  };
+
+  const handleBlur = e => {
+    setFoc(false);
+    handleSubmit(e);
   };
 
   return (
-    <ModalContent px="0.5rem" borderRadius="2px">
+    <ModalContent m={0} p={0} borderRadius="2px" w="lg">
       <ModalHeader fontSize="20px">Invite People to {name}</ModalHeader>
       <ModalCloseButton onClick={onClo} />
       <ModalBody>
@@ -76,17 +69,17 @@ export const Step1 = ({
         <Container
           border="1px"
           spacing={4}
-          p="3"
+          p="2"
           borderRadius="2px"
           borderColor={foc ? (!forerr ? "green.300" : "red.200") : "gray.200"}
-          maxW="container.xl"
-          minH={120}
+          maxW="container.3xl"
+          minH={100}
         >
           {listEmail?.map((e_mail, index) => (
             <Tag
               boxShadow="md"
-              p="1"
-              m="1"
+              mt={1}
+              mr={1}
               key={index}
               colorScheme={!e_mail.error ? "green" : "red"}
             >
@@ -96,9 +89,8 @@ export const Step1 = ({
             </Tag>
           ))}
 
-          <form onSubmit={handleSubmit} style={{ display: "inline" }}>
+          <form onSubmit={handleSubmit} style={{ display: "inline-block" }}>
             <Input
-              maxW="40%"
               placeholder="name@gmail.com"
               variant="unstyled"
               onChange={handleChange}
@@ -107,9 +99,11 @@ export const Step1 = ({
               type="email"
               borderRadius="2px"
               onFocus={() => setFoc(true)}
-              onBlur={() => setFoc(false)}
+              onBlur={handleBlur}
               value={val}
               pt={1}
+              mx={1}
+              mt={1}
             />
           </form>
         </Container>
@@ -120,7 +114,7 @@ export const Step1 = ({
           </Text>
         ) : null}
 
-        <div className={`mt-3 pt-3 d-flex my-auto justify-content-between`}>
+        <div className={`mt-1 pt-2 d-flex my-auto justify-content-between`}>
           <p
             onClick={() => {
               window.navigator.clipboard.writeText(
@@ -132,20 +126,20 @@ export const Step1 = ({
               );
             }}
             className={`mb-0 align-items-center`}
-            style={{ color: "#00B87C", fontSize: "15px" }}
+            style={{ color: "#00B87C", fontSize: "0.8rem" }}
           >
             <LinkIcon mr="1" />
             Copy invite link{" "}
-            <span style={{ color: "black", fontSize: "15px" }}>
+            <span style={{ color: "black", fontSize: "0.8em" }}>
               {" "}
               - Edit link settings{" "}
             </span>
           </p>
           <button
-            onClick={sendButton}
+            onClick={handleSend}
             style={{ color: "white", backgroundColor: "#00B87C" }}
             type="button"
-            // disabled={inviteEmail === '' ? true : false}
+            disabled={forerr ? true : false}
             className={`btn my-auto `}
           >
             Send
